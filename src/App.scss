@@ -1,0 +1,184 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  height: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  font-family: "Roboto", sans-serif;
+  font-size: 15px;
+  background: linear-gradient(to bottom, #333 0%, #48c 100%);
+}
+
+h1 {
+  color: black;
+  margin-bottom: 12px;
+  font-size: 3em;
+  font-weight: normal;
+}
+
+$green: #31ec68;
+$red: #f65050;
+$lightRed: lighten(#f65050, 4%);
+$grey: #ada49e;
+$lightGrey: lighten(#cdc4be, 10%);
+$darkGrey: darken(#cdc4be, 4%);
+
+#todoList {
+  width: 80vw;
+  box-shadow: -2px 2px 2px -1px rgba(0, 0, 0, 0.15);
+  border-radius: 8px 8px 0 0;
+  background: $lightGrey;
+  overflow: auto;
+  max-height: 40vh;
+  height: 40vh;
+
+  ul {
+    list-style: none;
+    padding: 20px;
+
+    li {
+      display: flex;
+      align-items: center;
+      line-height: 1;
+      user-select: none;
+
+      &:not(:last-child) {
+        padding-bottom: 15px;
+      }
+      &:hover {
+        cursor: text;
+      }
+
+      .checkBox {
+        width: 14px;
+        height: 14px;
+        border: 2px solid $grey;
+        border-radius: 50%;
+        margin-right: 4px;
+        position: relative;
+        display: flex;
+        opacity: 0.7;
+        color: white;
+
+        &:hover {
+          cursor: pointer;
+          opacity: 1;
+        }
+
+        &:before {
+          content: "";
+          margin: auto;
+          font-size: 0.8em;
+          opacity: 0.5;
+        }
+
+        &.done {
+          border-color: grey;
+          color: black;
+          opacity: 0.7;
+        }
+        &.done:before {
+          opacity: 1;
+        }
+      }
+
+      .fa-trash {
+        padding: 0 4px;
+        opacity: 0.1;
+        color: black;
+        transition: all 0.1s ease-in-out;
+        font-size: 1.2em;
+      }
+
+      &:hover .fa-trash {
+        opacity: 0.9;
+        cursor: pointer;
+      }
+
+      span {
+        position: relative;
+
+        &,
+        &:before {
+          transition: all 0.2s ease-in-out;
+        }
+
+        &:before {
+          content: "";
+          height: 1px;
+          background: $darkGrey;
+          width: 0%;
+          top: 50%;
+          position: absolute;
+          left: 0;
+        }
+      }
+
+      &.done span {
+        color: $darkGrey;
+        &:before {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+#newTask {
+  background: $lightGrey;
+  padding: 15px;
+  display: flex;
+  border-radius: 0 0 8px 8px;
+  margin-top: 0px;
+
+  input {
+    flex: 1;
+    margin-right: 10px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    border-left: 2px solid $red;
+    font-family: "Roboto", sans-serif;
+  }
+
+  button {
+    outline: none;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.5em;
+    color: white;
+    background: $red;
+    display: flex;
+    width: 35px;
+    height: 35px;
+    transition: all 0.15s ease-in-out;
+
+    span {
+      margin: auto;
+    }
+
+    &:hover {
+      cursor: pointer;
+      background: $lightRed;
+    }
+  }
+}
+
+::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.tiny {
+  font-size: 9px;
+}
