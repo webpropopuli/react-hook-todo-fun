@@ -1,55 +1,57 @@
-import React, { Fragment, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faTrash, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faTrash } from "@fortawesome/free-solid-svg-icons";
 import "./App.scss";
+import axios from "axios";
 
 function App() {
-  let [inputValue, setValue] = useState("");
-  let [tasks, setTask] = useState([
-    {
-      id: 50,
-      label: "Clean fish tanks",
-      done: true
-    },
-    {
-      id: 1,
-      label: "Wash hands",
-      done: false
-    },
-    {
-      id: 2,
-      label: "Re-wash hands...eww",
-      done: false
+  let [inputValue, setValue] = useState(``); // new item data
+  let [todos, setTodos] = useState({ hits: [] }); // the current list
+  let [dataType, setDataType] = useState(`todos`); // fetch endpoint, todo or post
+  let [isLoading, setIsLoading] = useState(false); // show "loading" during fetch
+
+  /* ## fetch handler ## */
+  useEffect(() => {
+    async function fetchData() {
+      setIsLoading(true);
+      const URL = `https://jsonplaceholder.typicode.com/${dataType}`;
+      const result = await axios(URL);
+
+      setTodos(result.data.slice(0, 10)); // grab first 10 for now
     }
-  ]);
+    fetchData();
+    setIsLoading(false);
+  }, [dataType]); //! in a fetch, 2nd param must be '[optional]' to avoid fetching every update
 
-  const removeTask = taskId => {
-    const currentTasks = [...tasks];
-    const targetIdx = currentTasks.findIndex(task => task.id === taskId);
-    currentTasks.splice(targetIdx, 1);
-    return setTask(currentTasks);
-  };
-
-  const changeStatus = taskId => {
-    const currentTasks = [...tasks];
-    const targetIdx = currentTasks.findIndex(task => task.id === taskId);
-    currentTasks.splice(targetIdx, 1, {
-      ...currentTasks[targetIdx],
-      done: !currentTasks[targetIdx].done
-    });
-    return setTask(currentTasks);
+  /* ########### */
+  const removeTodo = todoId => {
+    const currentTodos = [...todos];
+    const targetIdx = currentTodos.findIndex(todo => todo.id === todoId);
+    currentTodos.splice(targetIdx, 1);
+    return setTodos(currentTodos);
   };
 
   /* ########### */
-  const addTask = () => {
+  const changeStatus = todoId => {
+    const currentTodos = [...todos];
+    const targetIdx = currentTodos.findIndex(todo => todo.id === todoId);
+    currentTodos.splice(targetIdx, 1, {
+      ...currentTodos[targetIdx],
+      completed: !currentTodos[targetIdx].completed
+    });
+    return setTodos(currentTodos);
+  };
+
+  /* ########### */
+  const addTodo = () => {
     if (inputValue.length > 0) {
-      let newTask = {
+      let newTodo = {
         id: Date.now(),
-        label: inputValue,
-        done: false
+        title: inputValue,
+        completed: false
       };
 
-      setTask([...tasks, newTask]);
+      setTodos([...todos, newTodo]);
       return setValue("");
     }
   };
@@ -58,7 +60,7 @@ function App() {
   const handleKeyUp = event => {
     if (event.key === "Enter") {
       console.log("ENTER");
-      addTask();
+      addTodo();
     }
   };
 
@@ -68,46 +70,57 @@ function App() {
     setValue(e.target.value);
   };
 
+  const onChangeDataType = () => {
+    setDataType(dataType === "posts" ? "todos" : "posts");
+  };
+
   return (
     <>
       <div id="todoList">
-        {/* DUMP ALL TASKS IN LIST */}
-        <ul>
-          {tasks.length > 0 ? (
-            tasks.map((task, i) => (
-              <li key={"k" + i} className={task.done ? "done" : ""}>
-                {/* CHECKBOX */}
-                <FontAwesomeIcon
-                  icon={faCheck}
-                  className={task.done ? "checkBox done" : "checkBox"}
-                  onClick={() => changeStatus(task.id)}
-                />
+        {isLoading ? (
+          <div>Loading ...</div>
+        ) : (
+          <ul>
+            {/* DUMP ALL ToDos IN LIST */}
+            {todos.length > 0 ? (
+              todos.map((todo, i) => (
+                <li key={"k" + i} className={todo.completed ? "done" : ""}>
+                  {/* CHECKBOX */}
+                  <FontAwesomeIcon
+                    icon={faCheck}
+                    className={todo.completed ? "checkBox done" : "checkBox"}
+                    onClick={() => changeStatus(todo.id)}
+                  />
 
-                {/* DELETE icon */}
-                <FontAwesomeIcon icon={faTrash} className="fa fa-trash" onClick={() => removeTask(task.id)} />
+                  {/* DELETE icon */}
+                  <FontAwesomeIcon icon={faTrash} className="fa fa-trash" onClick={() => removeTodo(todo.id)} />
 
-                {/* CONTENT */}
-                <span>
-                  {task.label} <span className="tiny">(ID: {task.id}) </span>
+                  {/* CONTENT */}
+                  <span>
+                    {todo.title} <span className="tiny">(ID: {todo.id}) </span>
+                  </span>
+                </li>
+              ))
+            ) : (
+              <li>
+                No todos!{" "}
+                <span role="img" aria-label="smilemoji">
+                  😃
                 </span>
               </li>
-            ))
-          ) : (
-            <li>
-              No tasks!{" "}
-              <span role="img" aria-label="smilemoji">
-                😃
-              </span>
-            </li>
-          )}
-        </ul>
+            )}
+          </ul>
+        )}
       </div>
 
-      <div id="newTask">
+      <div id="newTodo">
         <input onChange={onCh} type="text" placeholder="inputValue" value={inputValue} onKeyUp={handleKeyUp} />
 
-        <button onClick={addTask}>
+        <button onClick={addTodo}>
           <span>+</span>
+        </button>
+        <button type="button" onClick={onChangeDataType}>
+          {dataType}
         </button>
       </div>
     </>
